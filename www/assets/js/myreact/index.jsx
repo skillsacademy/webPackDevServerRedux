@@ -16,48 +16,50 @@ import { List, Map } from 'immutable';
 // ##############################################################################
 // INITIAL DATA ( using immutable.js to initiate)
 const uid = function(){ return Math.random().toString(34).slice(2)}; // hack to create a passable unique id
-var objEach = {
+
+const objItem = {
 	id: uid(),
 	isDone: false,
 	text: 'some default text.'
 };
-const listDummyTodos = List([objEach]);
+
+const listDummyTodos = List([objItem]);
 
 // ##############################################################################
-// REDUCER 
+// REDUCER   - ( manages state updates )
 const todoListReducer = function(todos = listDummyTodos, action) {
 	//todos = (typeof todos!==undefined)?todos:listDummyTodos;
 	switch(action.type) {
-		case 'add':    	     
-			var objNew = Map(objEach);
-			objNew.text = action.text;	
-			objNew.id = uid();
-			return todos.push(objNew); 
+		case 'add': 
+			var newItem = Map(objItem).merge({
+				id: uid(), 
+				text: action.text
+			}).toObject();
+
+			return todos.push(newItem); 
 
 		default:
 			return todos;
 	}
 }
-const store = createStore(todoListReducer);
 
+const todoStore = createStore(todoListReducer);
 
 // ################################################################################
 // HTML COMPONENT
-class ToDoList extends React.Component { 
-	constructor() {
-		super();
-		this._handleKeyDown = this._handleKeyDown.bind(this);
-	}
 
-	_handleKeyDown (event){// handle ENTER KEY.....
+var XmlToDoList = React.createClass({
+	_handleKeyDown: function (event){// handle ENTER KEY.....
 		const isEnterKey = (event.which == 13);
 		if(isEnterKey) {
 			var val =  '' + event.target.value;		
 			event.target.value = '';// reset
-			store.dispatch({type:'add', text: val });
+
+			// 1) update data
+			todoStore.dispatch({type:'add', text: val });
 		}
-	} 		
-	render () {    
+	},		
+	render:function () {    
 		return (
 			<div className='todo'>
 				<input type='text'
@@ -74,23 +76,25 @@ class ToDoList extends React.Component {
 				</ul>
 			</div>
     	)
-  	}
- 	
-}
+  	} 	
+});
 
-// connect state to props 
-const TodoListConnectingStateUpdates = connect(
+// ################################################################################
+// SUBSCRIBE HTML COMPONENT TO STATE UPDATES
+
+const ToDoListSubscriber = connect(
+	// This is like assigning state to todos, as follows: <ToDoListSubscriber todos={state}/> 
   function mapStateToProps(state) {
     return { todos: state };
   }
-)(ToDoList);
+)(XmlToDoList);
 
 
 class App extends React.Component {
   render () {
     return (     
-	    <Provider store={store}>
-    		<TodoListConnectingStateUpdates/> 
+	    <Provider store={todoStore}>
+    		<ToDoListSubscriber/> 
   		</Provider>
     );
   }
