@@ -16,5 +16,7 @@
 5) visit this url inside a browser: 
 http://localhost:3000/default.
 
-6) Try re-saving one of the scss files and watch the page update, without refreshing.
+6) Type into the input box and press [enter] to create todo.
+
+7) this works by the unordered list subscribing to the redux store. 
 
