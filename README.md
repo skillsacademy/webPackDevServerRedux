@@ -14,7 +14,7 @@
 4) type: npm run dev
 
 5) visit this url inside a browser: 
-http://localhost:3000/default.
+http://localhost:3000/default.htm
 
 6) Type into the input box and press [enter] to create todo.
 
